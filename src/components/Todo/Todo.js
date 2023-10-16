@@ -6,6 +6,9 @@ import TodoActions from '../TodoActions/TodoActions'
 import TodoRender from '../TodoRender/TodoRender'
 import { v4 as uuidv4 } from 'uuid';
 
+const localData = localStorage.getItem('todos');
+const initialTodos = localData ? JSON.parse(localData) : [];
+
 
 const initialFormData = {
   isEdit: false,
@@ -34,15 +37,23 @@ const setFilteredTab = (tab, todos) => {
     return todos.filter((todo) => todo.isFinished)
 
   }
-
 }
+
+const saveToLocalStorage = (key, data) => {
+  localStorage.setItem(key, JSON.stringify(data));
+};
+
+const loadFromLocalStorage = (key) => {
+  const data = localStorage.getItem(key);
+  return data ? JSON.parse(data) : null;
+};
 
 const Todo = () => {
 
   const [tab, setTab] = useState(0)
   const [isOpen, setIsOpen] = useState(false)
   const [isOpenDisplayTodo, setIsOpenDisplayTodo] = useState(false)
-  const [todos, setTodos] = useState([])
+  const [todos, setTodos] = useState(initialTodos)
   const [formData, setFormData] = useState(initialFormData)
 
   const totalCount = getIsFinishedTodosCount(todos)
@@ -68,10 +79,16 @@ const Todo = () => {
       const editedTodos = todos;
       editedTodos.splice(formData.index, 1, { ...formData, isEdit: false, index: null })
       setTodos(editedTodos)
+      saveToLocalStorage('todos', editedTodos);
+
     } else {
-      setTodos((prevState) => [...prevState, { ...formData, id: uuidv4() }])
+      const newTodo = { ...formData, id: uuidv4() };
+      const updatedTodos = [...todos, newTodo];
+      setTodos(updatedTodos);
+      saveToLocalStorage('todos', updatedTodos);
 
     }
+
     resetAll()
   }
 
@@ -79,6 +96,8 @@ const Todo = () => {
     const updateTodos = todos.slice();
     updateTodos.splice(index, 1, { ...todos[index], isFinished: isChecked });
     setTodos(updateTodos)
+    saveToLocalStorage('todos', updateTodos);
+
   }
 
   const handleOpenTodo = (todo) => {
@@ -93,7 +112,10 @@ const Todo = () => {
   }
 
   const handleRemoveTodo = () => {
-    setTodos(todos.filter((item) => item.id !== formData.id))
+    const updatedFilteredTodos = todos.filter((item) => item.id !== formData.id)
+    setTodos(updatedFilteredTodos)
+    saveToLocalStorage('todos', updatedFilteredTodos);
+
     resetAll()
   }
 
