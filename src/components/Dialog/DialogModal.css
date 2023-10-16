@@ -1,0 +1,16 @@
+form {
+   display: flex;
+   flex-direction: column;
+   height: 280px;
+   justify-content: space-between;
+   margin: 20px 0;
+}
+
+.MuiDialog-paperWidthSm {
+   width: 450px;
+   min-height: 350px;
+}
+
+.MuiDialogTitle-root {
+   border-bottom: 1px solid #8080802b;
+}
